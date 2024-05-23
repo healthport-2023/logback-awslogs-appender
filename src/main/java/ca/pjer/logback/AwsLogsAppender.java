@@ -209,7 +209,7 @@ public class AwsLogsAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 addStatus(new WarnStatus("No logGroupName, default to " + logGroupName, this));
             }
             if (logStreamName != null) {
-                if (name.indexOf('%') > 0) {
+                if (logStreamName.indexOf('%') > 0) {
                     final PatternLayout patternLayout = new PatternLayout();
                     patternLayout.setPattern(logStreamName);
                     patternLayout.setContext(context);
