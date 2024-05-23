@@ -1,6 +1,9 @@
 package ca.pjer.logback;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
@@ -205,7 +208,21 @@ public class AwsLogsAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 logGroupName = getClass().getSimpleName();
                 addStatus(new WarnStatus("No logGroupName, default to " + logGroupName, this));
             }
-            if (logStreamName == null) {
+            if (logStreamName != null) {
+                if (name.indexOf('%') > 0) {
+                    final PatternLayout patternLayout = new PatternLayout();
+                    patternLayout.setPattern(logStreamName);
+                    patternLayout.setContext(context);
+                    patternLayout.start();
+
+                    LoggingEvent event = new LoggingEvent();
+                    event.setLevel(Level.INFO);
+                    event.setLoggerName("logStreamName");
+                    event.setMessage("log stream name");
+                    event.setTimeStamp(System.currentTimeMillis());
+                    logStreamName = patternLayout.doLayout(event);
+                }
+            } else {
                 if (logStreamUuidPrefix != null) {
                     logStreamName = String.format("%s%s", logStreamUuidPrefix, UUID.randomUUID().toString());
                 } else {
